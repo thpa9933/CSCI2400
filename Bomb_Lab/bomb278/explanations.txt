@@ -1,0 +1,65 @@
+phase_1:
+	Essentially comparing edi (what we input) to esi
+	sub $0x8, %rsp	---> Clears 8 bits from top of stack to store new address in
+	mov <hex>, %esi ---> Stores hex pointer value in esi register
+	call str_not_equal
+	test %eax, %eax ---> Sets zero flag ZF when AND operation results to zero. SF (sign flag) otherwise
+	add $0x8, %rsp ---> Add mem value back to top of stackk
+
+
+Phase_2:
+
+
+
+Phase_3:
+	- I inspect esi to see the type of values that will be stored, these are my expected inputs using x/s <hexidecimal>
+	Find where you statements are being compared by stepping through your code with ni, when a bomb gets called, look about in the disas to see the values being compared
+	The first statement compares to 2, so your first int is 2
+	Inpsect the values being compared, and change them to characters or decimals if necessary
+	Character value is in al, so convert from hex to decimal, and decimal to ascii
+
+Phase_4:
+x = c
+x = x - b
+x >> 1
+x = x + b
+
+if(a <= x):
+  eax = x
+  if(a >= x):
+    return y
+  else
+    b = y + 1
+    return x + funct4(a, y+1, c)
+else
+  c = y - 1
+  return x + func4(a, b, y-1)
+
+
+Phase_5: 
+- The general gist: 
+	A string is being encoded with shift cypher
+	We need 6 characters that can be decryped as 'devils'
+	Find the shift amount of each char by the offset of the chars in the wonky string
+- notice how your input is being compard in strlength to 0x6, indicating you need 6 characters
+- notice how your input is 'anded' by 0xf, indicating a mask of the lower 4 bits
+- x/s 0x402470 shows a string a wonky string with maduiersnfotvbyl in front throwing some flags
+- x/s -x402427 shows "devils"
+- generally examine content in the 'mov' commands because it usually shows register contents being stored in registers
+- determine the offset of each character in 'devil' within the wonky string above
+- char___offset___hex___AsciiThatEnds
+   d       2      0x2      B
+   e       5      0x5      E
+   v       12     0xc      L
+   i       4      0x4      D
+   l       15     0xf      O
+   s       7      0x7      W
+
+Phase_6
+- 3 parts
+- Part 1: input 6 numbers via <read_six_numbers> func
+- Part 2: 2 conditional loops, check if input is less than 6, then check if input is identical as other inputs (write this in C code!!)
+- Part 3: predefined linked list, check above last explode_bomb
+- Show where the address of the LL is stored
+- or Go until last jump before explode bomb, and examine eax, rbx, see the address of each one that shows the correct node and the corresponding values of each node
+- show the value of nodes and the correct order

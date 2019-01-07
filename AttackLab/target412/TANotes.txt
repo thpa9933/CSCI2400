@@ -1,0 +1,25 @@
+phase_1:
+What is a buffer overflow attack?
+How did you get the buffer size?
+    - 0x28 in getbuf
+    - know how to execute the answer .. cat p1.txt | ./hex2dec | ./ctarget
+   
+
+phase_2:
+How do you find addr of stack pointer (rsp)?
+    - Go past getbuf, input a very long string, the print rsp addr (x/s $rsp).. The string takes care of filling the stack
+How do you construct the instruction?
+    - Show how you move the cookie into the rdi register 
+    - gc -c p2.s
+    - objdump -d p2.o > p2.d
+    - Cat p2.d and see the addr of the rdi register being used
+   
+phase_3:
+    - Show how you pad the first line in the text file (rsp + 0x38)
+    - Show you construct move instruction 
+    - used "unit-conversion.info/texttools/hexidecimal" to convert cookie into hextext
+    
+phase_4:
+    - What is an ROP attack?
+    - How do you find teh gadgets for phase4?
+    - Show how the rax starts at a specific byte so you have to add to it to get correct address

